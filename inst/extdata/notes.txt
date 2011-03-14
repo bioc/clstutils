@@ -1,0 +1,34 @@
+## create alignment of sequences as package data
+library(ape)
+source("/home/bvdiversity/scripts/common.R")
+
+unaligned_file <- "/home/bvdiversity/data/ref_out/merged.fasta"
+
+typestrains <- readLines('/home/bvdiversity/data/ref_out/rdp_typestrains.txt')
+seqmat <- loadf("/home/bvdiversity/data/ref_out/merged_as_mat.rda")[[1]]
+seqData <- taxdata(unaligned_file) ## from common.R
+seqData$isType <- seqData$seqname %in% typestrains
+
+keep <- grepl('^Enterococcus', seqData$tax_name) & !seqData$seqname %in% c('S000996440')
+
+allgap <- apply(seqmat[keep,], 2, {
+  function(col) sum(col == 04) == sum(keep)
+})
+
+seqs <- seqmat[keep,!allgap]
+seqdat <- seqData[keep,]
+
+writeFasta('/home/bvdiversity/src/clstutils/inst/extdata/seqs.fasta',
+           seqs, seqdat)
+
+save(seqs, file='/home/bvdiversity/src/clstutils/data/seqs.rda')
+save(seqdat, file='/home/bvdiversity/src/clstutils/data/seqdat.rda')
+
+## sl <- read.dna("/home/bvdiversity/src/clstutils/inst/extdata/seqs.fasta",format='fasta',as.matrix=FALSE)
+## sm <- read.dna("/home/bvdiversity/src/clstutils/inst/extdata/seqs.fasta",format='fasta',as.matrix=TRUE)
+
+
+## writeFasta('/home/bvdiversity/src/clstutils/inst/extdata/sl.fasta',
+##            sl, seqdat)
+
+

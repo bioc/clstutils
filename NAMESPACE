@@ -1,0 +1,40 @@
+import(lattice)
+import(RSQLite)
+import(clst)
+
+## classes
+exportClasses(
+
+              )
+
+exportMethods(
+
+              )
+
+## functions
+export(
+       ## placeTools.R
+       classifyPlacements,
+       ## placeTree,
+       ## unplace,       
+       ## placeMat,
+       ## placeMap,
+       treeDists,
+       placeData,
+       
+       ## taxTools.R
+       ## nodeTable,
+       maxDists,
+       findOutliers,
+       refpkgContents,
+       taxonomyFromRefpkg,
+       
+       ## treeTools.R
+
+       ## prettyTree.R
+       prettyTree
+
+       ## svgTree.R
+       ## svgTree       
+       )
+

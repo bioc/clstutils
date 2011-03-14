@@ -1,0 +1,22 @@
+TARGET=pplacerDemo
+
+all: sweave latex
+
+full: all clean
+
+sweave:
+	R CMD Sweave ${TARGET}.Rnw
+
+stangle:
+	R CMD Stangle ${TARGET}.Rnw && R --slave < ${TARGET}.R
+
+latex: 
+	pdflatex ${TARGET} && pdflatex ${TARGET} && pdflatex ${TARGET}
+
+clean: 
+	ls ${TARGET}.* | egrep -v 'Rnw|pdf' | xargs rm && \
+	rm -rf figs_temp Rplots.pdf
+
+distclean:
+	ls ${TARGET}.* | grep -v .Rnw | xargs rm && \
+	rm -rf figs_temp Rplots.pdf

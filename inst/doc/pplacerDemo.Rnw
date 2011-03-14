@@ -1,0 +1,177 @@
+%\VignetteIndexEntry{clst}
+%\VignetteKeywords{clst, classifier, ROC}
+%\VignettePackage{clst}
+
+
+%
+% NOTE -- ONLY EDIT THE .Rnw FILE!!!  The .tex file is
+% likely to be overwritten.
+%
+\documentclass[10pt]{article}
+
+\usepackage{amsmath,pstricks}
+\usepackage[authoryear,round]{natbib}
+\usepackage{hyperref}
+\usepackage{subfigure}
+
+% all figures at end of document
+\usepackage{endfloat}
+\usepackage{fancyvrb}
+
+
+%%%% NOT the default vignette page layout
+\usepackage[margin=2cm]{geometry} 
+\geometry{letterpaper} 
+
+%%%% part of default vignette page layout (or at least, it came from somewhere)
+% \textwidth=6.2in
+% \textheight=8.5in
+% %\parskip=.3cm
+% \oddsidemargin=.1in
+% \evensidemargin=.1in
+% \headheight=-.3in
+
+\newcommand{\scscst}{\scriptscriptstyle}
+\newcommand{\scst}{\scriptstyle}
+
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
+\newcommand{\Rmethod}[1]{{\texttt{#1}}}
+\newcommand{\Rfunarg}[1]{{\texttt{#1}}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
+\newcommand{\code}[1]{{\texttt{#1}}}
+
+\newcommand{\shellcommand}[1]{{\texttt{#1}}}
+\DefineVerbatimEnvironment{shell}{Verbatim}{fontshape=sl}
+
+\bibliographystyle{plainnat}
+
+\begin{document}
+%\setkeys{Gin}{width=0.55\textwidth}
+%\setkeys{Gin}{width=8in}
+
+% figures saved in ./figs; create if necessary below
+<<echo=FALSE>>=
+  figdir <- 'figs'
+  dir.create(figdir, showWarnings=FALSE)
+@ 
+\SweaveOpts{prefix.string=\Sexpr{figdir}/clst,eps=FALSE,keep.source=TRUE} 
+
+\title{Taxonomic classification using \shellcommand{pplacer},
+  \Rpackage{clst}, and \Rpackage{clstutils}} 
+\author{Noah Hoffman}
+\maketitle
+
+\tableofcontents
+
+\section{Introduction}
+
+This vignette assumes that you have already created a reference
+package, and have used it to run \shellcommand{pplacer} against an
+alignment of reference sequences. For instruction on performing the
+above operations, see the documentation for \shellcommand{pplacer}
+here: \url{http://matsen.fhcrc.org/pplacer/}
+
+\section{Input files}
+
+The following input is required (file names defined as variables in parentheses):
+
+\begin{enumerate}
+  \item a reference package (\code{refpkg})
+  \item a pplacer file created using the same reference package (\code{placefile})
+  \item a file providing distances between nodes in the reference tree (\code{distfile})
+\end{enumerate}
+
+Note that \code{distfile} is generated from \code{placefile} using
+\shellcommand{placeutil} (distributed with \shellcommand{pplacer}).
+
+<<data>>=
+library(clstutils)
+
+expand <- function(fname){
+  destdir <- tempdir()
+  archive <- system.file('extdata','vaginal_16s.refpkg.tar.bz2', package='clstutils')
+  system(gettextf('tar -xjf %s --directory="%s"', archive, destdir))
+  file.path(destdir, fname)
+}
+
+refpkg <- expand('vaginal_16s.refpkg')
+placefile <- system.file('extdata','qalign.place.bz2', package='clstutils')
+distfile <- system.file('extdata','qalign.distmat.bz2', package='clstutils')
+@
+
+\section{Reading the input}
+
+Classification requires a matrix representation of distances between
+``objects'' being classified, in this case sequences in a phylogenetic
+tree. \Rfunction{treeDists} returns a list containing matrix
+representations of distances between internal and terminal edges
+(\code{\$dists} and \code{\$paths}), and \code{\$dmat}, a square
+matrix of distances between terminal edges. 
+
+<<treeDists>>=
+treedists <- treeDists(distfile=distfile, placefile=placefile)
+@
+
+We also need a description of the taxonomy of the reference
+sequences. This is read from the reference package using
+\Rfunction{taxonomyFromRefpkg}. The \Rfunarg{seqnames} argument
+ensures that the output is arranged in an order compatible with
+\code{treedists}. We indicate that the most specific rank that we want
+to consider is ``species'' using \Rfunarg{lowest\_rank}.
+
+<<taxonomyFromRefpkg>>=
+taxdata <- taxonomyFromRefpkg(refpkg, seqnames=rownames(treedists$dmat), lowest_rank='species')
+@
+
+\section{Classification of a single sequence}
+
+Given the distances and taxonomic information describing the reference
+tree, the only additional data required to perform classification is
+the position of a sequence placed onto a tree. At a minimum, this
+consists of a data.frame with columns \code{at}, \code{edge}, and
+\code{branch}. This data will be used to generate a vector of branch
+lengths between the query sequence and each of the reference sequences
+on the tree.
+
+<<>>=
+placetab <- data.frame(at=49, edge=5.14909e-07, branch=5.14909e-07)
+@ 
+
+The function \Rfunction{classifyPlacements} is a wrapper around
+\Rpackage{clst}::\Rfunction{classifyIter}. The output is a
+\Robject{data.frame} describing the taxonomic assignment, along with a
+description of the confidence of the classification. See the man page
+for \Rpackage{clst}::\Rfunction{classify} for details on the output.
+
+<<>>=
+cdata <- classifyPlacements(taxdata, treedists, placetab)
+cdata
+@
+
+\section{Classification of multiple sequences}
+
+Placement information for multiple sequences may be contained in a
+placefile. This information can be read directly from a single
+placefile using \Rfunction{placeData}.
+
+<<>>=
+placetab <- placeData(placefile)
+head(placetab)
+@ 
+
+Note that pplacer also provides tax\_id assignments using a different
+method. Also, a list of possible placements are provided for each
+sequence accompanied by the probability of each. We will use only the
+first placement (ie, the top ``hit'') for each sequence.
+
+<<>>=
+tophits <- subset(placetab, hit==1)
+set.seed(125)
+cdata <- classifyPlacements(taxdata, treedists, 
+                            tophits[sample(nrow(tophits),10),])
+cdata
+@ 
+
+\end{document}

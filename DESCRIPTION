@@ -1,0 +1,13 @@
+Package: clstutils
+Type: Package
+Title: Tools for performing taxonomic assignment.
+Version: 0.99.1
+Depends: R (>= 2.10), clst, rjson, ape
+Imports: lattice, RSQLite
+Suggests: RUnit, RSVGTipsDevice
+LazyLoad: yes
+LazyData: yes
+Author: Noah Hoffman
+Maintainer: <ngh2@uw.edu>
+Description: Tools for performing taxonomic assignment based on phylogeny using pplacer and clst.
+License: GPL-3

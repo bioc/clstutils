@@ -1,0 +1,242 @@
+% \VignetteIndexEntry{clstutils}
+% \VignetteKeywords{clstutils, clst, classifier, ROC}
+% \VignettePackage{clstutils}
+
+%
+% NOTE -- ONLY EDIT THE .Rnw FILE!!!  The .tex file is
+% likely to be overwritten.
+%
+\documentclass[10pt]{article}
+
+\usepackage{amsmath,pstricks}
+\usepackage[authoryear,round]{natbib}
+\usepackage{hyperref}
+\usepackage{subfigure}
+
+% all figures at end of document
+\usepackage{endfloat}
+\usepackage{fancyvrb}
+
+
+%%%% NOT the default vignette page layout
+\usepackage[margin=2cm]{geometry}
+\geometry{letterpaper}
+
+%%%% part of default vignette page layout (or at least, it came from somewhere)
+% \textwidth=6.2in
+% \textheight=8.5in
+% %\parskip=.3cm
+% \oddsidemargin=.1in
+% \evensidemargin=.1in
+% \headheight=-.3in
+
+\newcommand{\scscst}{\scriptscriptstyle}
+\newcommand{\scst}{\scriptstyle}
+
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
+\newcommand{\Rmethod}[1]{{\texttt{#1}}}
+\newcommand{\Rfunarg}[1]{{\texttt{#1}}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
+\newcommand{\code}[1]{{\texttt{#1}}}
+
+\newcommand{\shellcommand}[1]{{\texttt{#1}}}
+\DefineVerbatimEnvironment{shell}{Verbatim}{fontshape=sl}
+
+\bibliographystyle{plainnat}
+
+\begin{document}
+%\setkeys{Gin}{width=0.55\textwidth}
+%\setkeys{Gin}{width=8in}
+
+% figures saved in ./figs; create if necessary below
+<<echo=FALSE>>=
+  figdir <- 'figs'
+  dir.create(figdir, showWarnings=FALSE)
+@
+\SweaveOpts{prefix.string=\Sexpr{figdir}/clst,eps=FALSE,keep.source=TRUE}
+
+\title{Reference set creation using \Rpackage{clstutils}}
+\author{Noah Hoffman}
+\maketitle
+
+\tableofcontents
+
+\section{Introduction}
+
+This vignette describes the use of functions in \Rpackage{clstutils}
+to create sets of reference sequences useful for performing
+phylogenetic-based taxonomic assignment. The primary inputs are an
+aligned set of sequences (in this case 16S rRNA), and annotation of
+taxonomic assignments.
+
+<<loadLibs>>=
+library(ape)
+library(lattice)
+library(clst)
+library(clstutils)
+@
+
+We will use data included in the package \Rpackage{clstutils} in the
+examples below. \Robject{seqs} is an object of class \Rclass{DNAbin}
+representing a multiple sequence alignment, and \Robject{seqdat} is a
+\Rclass{data.frame} containing taxonomic assignments of the sequences.
+
+<<>>=
+data(seqs)
+data(seqdat)
+@
+
+\section{Finding outliers}
+
+The example data contains sequences belonging to species in the genus
+\textit{Enterococcus}.
+
+<<>>=
+seqdat$i <- 1:nrow(seqdat)
+taxa <- split(seqdat, seqdat$tax_name)
+nseqs <- sapply(taxa, nrow)
+nseqs
+@
+
+\subsection{Identifying outliers in a single taxon}
+
+Sequences obtained from public sources may not have correct taxonomic
+labels. When a sequence is incorrectly labeled as taxon $A$, we
+predict that it will have an relatively large distance from other
+sequences that are correctly labeled as $A$. We will call these
+putatively mislabeled sequences \emph{outliers}.
+
+<<>>=
+Efaecium <- taxa[['Enterococcus faecium']]$i
+@
+
+Calculate a distance matrix using methods in \Rpackage{ape}.
+
+<<>>=
+dmat <- ape::dist.dna(seqs[Efaecium,], pairwise.deletion=TRUE, as.matrix=TRUE, model='raw')
+summary(dmat[lower.tri(dmat)])
+@
+
+The function \Rfunction{findOutliers} identifies a ``most central''
+sequence $S$, and defines outliers as sequences with distances to $S$
+that exceed some threshold. This threshold can be provided explicitly:
+
+<<>>=
+outliers <- clstutils::findOutliers(dmat, cutoff=0.015)
+table(outliers)
+@
+
+The threshold can also defined in terms of a quantile of all pairwise
+distances using the \code{quant} argument.
+
+We can visualize the outliers on a phylogenetic tree
+(\Rfunction{clst:PrettyTree} extends \Rfunction{ape::plot.tree} to
+facilitate annotation). Note that the type strain for this
+
+<<fig=TRUE>>=
+with(seqdat[Efaecium,], {
+  prettyTree(nj(dmat), groups=ifelse(outliers,'outlier','non-outlier'),
+             X=outliers, labels=ifelse(isType,gettextf('type strain (%s)', accession),NA))
+})
+@
+
+\subsection{Outliers for for multiple related taxa}
+
+First, generate a list of square distance matrices.
+
+<<>>=
+dmats <- lapply(taxa, function(taxon) {
+  ape::dist.dna(seqs[taxon$i,], pairwise.deletion=TRUE, as.matrix=TRUE, model='raw')
+})
+@
+
+Calculate outliers for each matrix. Here (as above) we are using a
+distance threshold of 1.5\% from the ``centermost'' sequence (i.e.,
+the one with the least sum of parwise distances to every other
+sequence).
+
+<<>>=
+outliers <- sapply(dmats, findOutliers, cutoff=0.015)
+@ 
+
+Add results of outlier status to \Robject{seqdat}.
+
+<<>>=
+seqdat$outlier <- FALSE
+for(x in outliers){
+  seqdat[match(names(x),seqdat$seqname),'outlier'] <- x
+}
+
+with(seqdat, table(tax_name, outlier))
+@
+
+It is instructive to visualize the effect of removing outliers on the
+distribution of within-species pairwise distances for each taxon. In
+the code fragment below, \Robject{omat} is a square matrix in which
+cells are TRUE if either margin is an outlier. We aggregate all of the
+pairwise distances in \Robject{dists}.
+
+<<>>=
+lowerTriangle <- function(mat){mat[lower.tri(mat)]}
+
+dists <- do.call(rbind, lapply(names(dmats), function(tax_name){
+  dmat <- dmats[[tax_name]]
+  omat <- sapply(outliers[[tax_name]], function(i) {i | outliers[[tax_name]]})
+  data.frame(distance=lowerTriangle(dmat), outlier=lowerTriangle(omat))
+}))
+
+dists$tax_name <- factor(rep(names(dmats), nseqs*(nseqs-1)/2))
+with(dists, table(tax_name, outlier))
+@
+
+<<fig=TRUE,height=3>>=
+plot(bwplot(distance ~ tax_name, data=dists, ylim=c(0,0.15)))
+@
+
+<<fig=TRUE,height=3>>=
+plot(bwplot(distance ~ tax_name, data=subset(dists, !outlier), ylim=c(0,0.15)))
+@
+
+Finally, we can visualize the fact that many of the outliers are
+actually the result of labels being switched between taxa (that is,
+\textit{E. faecium} sequenecs are labeled as \textit{E. faecalis}) and
+vice versa. In the tree below, terminal nodes are identified according
+to the original species labels.
+
+<<fig=TRUE>>=
+with(seqdat, {
+  dmat <- ape::dist.dna(seqs, pairwise.deletion=TRUE, as.matrix=TRUE, model='raw')
+  clstutils::prettyTree(nj(dmat), groups=tax_name,
+                        ## type='unrooted',
+                        X=outlier, fill=outlier)
+})
+
+@
+
+
+\section{Selecting a diverse subset}
+
+Because we cannot use every available sequence in our reference tree,
+a sampling strategy is required. One strategy is to select a maximally
+diverse subset of sequences. The function
+\Rfunction{clstutils::maxDists} performs this operation. In addition,
+we can exclude sequences identified as outliers in the previous step
+(outlier identification is critical here, lest we select primarily
+outliers!). We can also optionally include the ``centermost'' sequence
+in the set, plus any type strains.
+
+<<fig=TRUE>>=
+with(seqdat[Efaecium,], {
+  selected <- clstutils::maxDists(dmat, idx=which(isType), N=10, exclude=outlier, include.center=TRUE)
+  prettyTree(nj(dmat), groups=ifelse(outlier,'outlier','non-outlier'),
+             X=outlier,
+             O=selected, fill=selected,
+             labels=ifelse(isType,gettextf('type strain (%s)', accession),NA))
+})
+@
+
+Here the selected sequences are identified with circled, filled glyphs.
+
+\end{document}
