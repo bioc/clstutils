@@ -13,21 +13,15 @@ nodes.
 
 }
 \usage{
-treeDists(distfile, placefile, pmat, pmap)
+treeDists(placefile, distfile)
 }
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
 
-\item{distfile}{path to output of \command{placeutil --distmat}}
-
 \item{placefile}{path to \command{pplacer} output}
-  
-\item{pmat}{square matrix (output of \code{clstutils:::placeMat}); may be
-provided in the place of \code{pmat}}
 
-\item{pmap}{output of \code{clstutils:::placeMap} (data.frame); may be
-provided in the place of \code{pmap}}
+\item{distfile}{path to output of \command{guppy distmat}}
 
 }
 \details{
@@ -86,7 +80,7 @@ A list with the following elements:
 }
 \references{
   
-Documentation for \command{pplacer} can be found here:
+Documentation for \command{pplacer} and \command{guppy} can be found here:
 \url{http://matsen.fhcrc.org/pplacer/}
 
 }
@@ -106,9 +100,9 @@ The output of this function is required for \code{\link{classifyPlacements}}.
 }
 \examples{
 
-placefile <- system.file('extdata','qalign.place.bz2', package='clstutils')
-distfile <- system.file('extdata','qalign.distmat.bz2', package='clstutils')
-treedists <- treeDists(distfile=distfile, placefile=placefile)
+placefile <- system.file('extdata','merged.json', package='clstutils')
+distfile <- system.file('extdata','merged.distmat.bz2', package='clstutils')
+treedists <- treeDists(placefile, distfile)
 
 ## coordinates of a single placement
 placetab <- data.frame(at=49, edge=5.14909e-07, branch=5.14909e-07)

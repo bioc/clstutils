@@ -4,7 +4,7 @@
 \alias{clstutils}
 \docType{package}
 \title{
-Utilities for use with the clst2 package.
+Sequence based classification and selection of reference sequences.
 }
 
 \description{Tools for performing taxonomic assignment based on phylogeny using pplacer and clst.}
@@ -13,14 +13,8 @@ Utilities for use with the clst2 package.
 \tabular{ll}{
 Package: \tab clstutils\cr
 Type: \tab Package\cr
-Version: \tab 0.1.5256\cr
-Date: \tab 2011-03-14\cr
-Depends: \tab R (>= 2.10.0)\cr
-Imports: \tab lattice, methods, RUnit\cr
-LazyLoad: \tab yes\cr
-LazyData: \tab yes\cr
-License: \tab UW Free Fork\cr
-Built: \tab R 2.12.2; ; 2011-03-14; unix\cr
+Author: \tab Noah Hoffman <ngh2@uw.edu>\cr
+License: \tab GPL3\cr
 }
 
 Index:
@@ -49,4 +43,5 @@ Maintainer: <ngh2@uw.edu>
 }
 \examples{
 library(clstutils)
+packageDescription("clstutils")
 }

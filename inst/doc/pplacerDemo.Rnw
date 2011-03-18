@@ -97,8 +97,8 @@ expand <- function(fname){
 }
 
 refpkg <- expand('vaginal_16s.refpkg')
-placefile <- system.file('extdata','qalign.place.bz2', package='clstutils')
-distfile <- system.file('extdata','qalign.distmat.bz2', package='clstutils')
+placefile <- system.file('extdata','merged.json', package='clstutils')
+distfile <- system.file('extdata','merged.distmat.bz2', package='clstutils')
 @
 
 \section{Reading the input}
@@ -150,28 +150,28 @@ cdata <- classifyPlacements(taxdata, treedists, placetab)
 cdata
 @
 
-\section{Classification of multiple sequences}
+% \section{Classification of multiple sequences}
 
-Placement information for multiple sequences may be contained in a
-placefile. This information can be read directly from a single
-placefile using \Rfunction{placeData}.
+% Placement information for multiple sequences may be contained in a
+% placefile. This information can be read directly from a single
+% placefile using \Rfunction{placeData}.
 
-<<>>=
-placetab <- placeData(placefile)
-head(placetab)
-@ 
+% <<>>=
+% placetab <- placeData(placefile)
+% head(placetab)
+% @ 
 
-Note that pplacer also provides tax\_id assignments using a different
-method. Also, a list of possible placements are provided for each
-sequence accompanied by the probability of each. We will use only the
-first placement (ie, the top ``hit'') for each sequence.
+% Note that pplacer also provides tax\_id assignments using a different
+% method. Also, a list of possible placements are provided for each
+% sequence accompanied by the probability of each. We will use only the
+% first placement (ie, the top ``hit'') for each sequence.
 
-<<>>=
-tophits <- subset(placetab, hit==1)
-set.seed(125)
-cdata <- classifyPlacements(taxdata, treedists, 
-                            tophits[sample(nrow(tophits),10),])
-cdata
-@ 
+% <<>>=
+% tophits <- subset(placetab, hit==1)
+% set.seed(125)
+% cdata <- classifyPlacements(taxdata, treedists, 
+%                             tophits[sample(nrow(tophits),10),])
+% cdata
+% @ 
 
 \end{document}

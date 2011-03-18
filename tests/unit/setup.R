@@ -32,8 +32,8 @@ expand <- function(fname, destdir, package='clstutils'){
 }
 
 vag_refpkg <- expand('vaginal_16s.refpkg.tar.bz2', unit_output)
-placefile <- expand('qalign.place.bz2', unit_output)
-distfile <- expand('qalign.distmat.bz2', unit_output)
+distfile <- expand('merged.distmat.bz2', unit_output)
 
-placefilez <- system.file('extdata', 'qalign.place.bz2', package='clstutils')
-distfilez <- system.file('extdata', 'qalign.distmat.bz2', package='clstutils')
+jsonfile <- system.file('extdata', 'merged.json', package='clstutils')
+distfilez <- system.file('extdata', 'merged.distmat.bz2', package='clstutils')
+

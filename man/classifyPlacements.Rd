@@ -55,12 +55,12 @@ Noah Hoffman
 % }
 
 \seealso{
-\code{\link{treeDists}}, \code{\link{taxonomyFromRefpkg}}, \code{\link{placeData}}
+\code{\link{treeDists}}, \code{\link{taxonomyFromRefpkg}}
 }
 
 \examples{
-placefile <- system.file('extdata', 'qalign.place.bz2', package='clstutils')
-distfile <- system.file('extdata', 'qalign.distmat.bz2', package='clstutils')
+placefile <- system.file('extdata', 'merged.json', package='clstutils')
+distfile <- system.file('extdata', 'merged.distmat.bz2', package='clstutils')
 refpkgz <- system.file('extdata', 'vaginal_16s.refpkg.tar.bz2', package='clstutils')
 
 tmpdir <- tempdir()

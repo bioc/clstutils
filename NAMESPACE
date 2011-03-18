@@ -20,7 +20,7 @@ export(
        ## placeMat,
        ## placeMap,
        treeDists,
-       placeData,
+       ## placeData,
        
        ## taxTools.R
        ## nodeTable,

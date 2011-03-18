@@ -5,3 +5,5 @@
 inst/doc/figs
 tests/unit_output
 version.py
+man/hide
+R/attic.R
