@@ -8,7 +8,7 @@ Suggests: RUnit, RSVGTipsDevice
 LazyLoad: yes
 LazyData: yes
 Author: Noah Hoffman
-Maintainer: <ngh2@uw.edu>
+Maintainer: Noah Hoffman <ngh2@uw.edu>
 Description: Tools for performing taxonomic assignment based on phylogeny using pplacer and clst.
 License: GPL-3
 biocViews: HighThroughputSequencing, Classification, Visualization, QualityControl
