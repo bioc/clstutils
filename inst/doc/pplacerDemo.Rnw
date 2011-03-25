@@ -59,7 +59,7 @@
 \SweaveOpts{prefix.string=\Sexpr{figdir}/clst,eps=FALSE,keep.source=TRUE} 
 
 \title{Taxonomic classification using \shellcommand{pplacer},
-  \Rpackage{clst}, and \Rpackage{clstutils}} 
+  \Rpackage{clst}, and \Rpackage{clstutils}}
 \author{Noah Hoffman}
 \maketitle
 

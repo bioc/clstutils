@@ -104,7 +104,7 @@ nseqs
 
 Sequences obtained from public sources may not have correct taxonomic
 labels. When a sequence is incorrectly labeled as taxon $A$, we
-predict that it will have an relatively large distance from other
+predict that it will have relatively large distances from other
 sequences that are correctly labeled as $A$. We will call these
 putatively mislabeled sequences \emph{outliers}.
 
@@ -132,7 +132,7 @@ The threshold can also defined in terms of a quantile of all pairwise
 distances using the \code{quant} argument.
 
 We can visualize the outliers on a phylogenetic tree
-(\Rfunction{clst:PrettyTree} extends \Rfunction{ape::plot.tree} to
+(\Rfunction{clst::PrettyTree} extends \Rfunction{ape::plot.tree} to
 facilitate annotation). Note that the type strain for this
 
 <<fig=TRUE>>=
@@ -142,7 +142,7 @@ with(seqdat[Efaecium,], {
 })
 @
 
-\subsection{Outliers for for multiple related taxa}
+\subsection{Outliers for multiple related taxa}
 
 First, generate a list of square distance matrices.
 
@@ -229,7 +229,8 @@ in the set, plus any type strains.
 
 <<fig=TRUE>>=
 with(seqdat[Efaecium,], {
-  selected <- clstutils::maxDists(dmat, idx=which(isType), N=10, exclude=outlier, include.center=TRUE)
+  selected <- clstutils::maxDists(dmat, idx=which(isType),
+                                  N=10, exclude=outlier, include.center=TRUE)
   prettyTree(nj(dmat), groups=ifelse(outlier,'outlier','non-outlier'),
              X=outlier,
              O=selected, fill=selected,

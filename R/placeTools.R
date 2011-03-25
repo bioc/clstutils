@@ -27,6 +27,23 @@ classifyPlacements <- function(taxdata, treedists, placetab, ..., verbose=FALSE,
     stop(cat(paste('placetab must have all of the columns', requiredCols, '\n')))
   }
 
+  ## TODO: need to consider how to correct for long branch lengths of
+  ## placements.
+
+  ## * One approach would be to ignore the branch lengths of the
+  ##   placements, and instead add an offset, perhaps calculated from
+  ##   the lengths of the terminal branches of the reference
+  ##   sequences.
+
+  ## * another approach might be to transform the branch term below,
+  ##   somehow - take the log, perhaps?
+
+  ## * or, calculate the pairwise distances between reference
+  ##   sequences by ignoring terminal branch lengths as well?
+
+  ## Of course, the problem might arise mostly from not having
+  ## representative reference sequences to start with.
+  
   dvects <- with(placetab, {
     treedists$dists[at+1,,drop=FALSE] + treedists$paths[at+1,,drop=FALSE]*edge + branch
   })
