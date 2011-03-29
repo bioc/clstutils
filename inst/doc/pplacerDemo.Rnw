@@ -90,9 +90,12 @@ Note that \code{distfile} is generated from \code{placefile} using
 library(clstutils)
 
 expand <- function(fname){
+  orig.dir <- getwd()
   destdir <- tempdir()
+  setwd(destdir)
   archive <- system.file('extdata','vaginal_16s.refpkg.tar.bz2', package='clstutils')
-  system(gettextf('tar -xjf %s --directory="%s"', archive, destdir))
+  system(paste('tar --no-same-owner -xjf', destdir))
+  setwd(orig.dir)
   file.path(destdir, fname)
 }
 
