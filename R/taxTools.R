@@ -216,44 +216,6 @@ findOutliers <- function(mat, quant, cutoff){
   
 ## }
 
-## .abspath <- function(path){
-##   out <- sapply(path, function(pth){ 
-##     if(file.info(pth)$isdir){
-##       system(gettextf('cd "%s" && pwd', pth), intern=TRUE)
-##     }else{
-##       file.path(system(gettextf('cd "%s" && pwd', dirname(pth)), intern=TRUE),
-##                 basename(pth)
-##                 )   
-##     }
-##   })
-##   names(out) <- NULL
-##   out
-## }
-
-.abspath <- function(path){
-  ## Return the absolute path of vector of file or directory names. 
-  
-  ## I am appalled that this actually seems to be an acceptable way to determine an
-  ## absolute path: see
-  ## http://svn.r-project.org/R/trunk/src/library/tools/R/install.R
-  fullpath <- function(dir){
-    owd <- setwd(dir)
-    full <- getwd()
-    setwd(owd)
-    full
-  }
-
-  out <- sapply(path, function(pth){ 
-    if(file.info(pth)$isdir){
-      fullpath(pth)
-    }else{
-      file.path(fullpath(dirname(pth)), basename(pth))
-    }
-  })
-  names(out) <- NULL
-  out
-}
-
 refpkgContents <- function(path, manifest='CONTENTS.json'){
   ## Read the file `manifest` from a refpackage located at `path` and
   ## return a list containing the package contents.
@@ -265,7 +227,7 @@ refpkgContents <- function(path, manifest='CONTENTS.json'){
 
   ## TODO: validate md5 checksums
   
-  files <- lapply(file.path(path, contents$files), .abspath)
+  files <- lapply(file.path(path, contents$files), normalizePath)
   names(files) <- names(contents$files)
   contents$files <- files
     
