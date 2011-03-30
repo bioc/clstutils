@@ -94,7 +94,7 @@ expand <- function(fname){
   destdir <- tempdir()
   setwd(destdir)
   archive <- system.file('extdata','vaginal_16s.refpkg.tar.bz2', package='clstutils')
-  system(paste('tar --no-same-owner -xjf', archive))
+  system(sprintf('tar --no-same-owner -xjf "%s"', archive))
   setwd(orig.dir)
   file.path(destdir, fname)
 }
