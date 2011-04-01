@@ -64,11 +64,17 @@ distfile <- system.file('extdata', 'merged.distmat.bz2', package='clstutils')
 refpkgz <- system.file('extdata', 'vaginal_16s.refpkg.tar.bz2', package='clstutils')
 
 tmpdir <- tempdir()
-system(paste('tar -xf', refpkgz, '-C', tmpdir))
-refpkg <- file.path(tmpdir, 'vaginal_16s.refpkg')
+
+orig.dir <- getwd()
+setwd(tmpdir)
+system(paste("tar --no-same-owner -xjf", refpkgz))
+setwd(orig.dir)
+
+
+refpkg <- file.path(tmpdir, "vaginal_16s.refpkg")
 
 treedists <- treeDists(distfile=distfile, placefile=placefile)
-taxdata <- taxonomyFromRefpkg(refpkg, seqnames=rownames(treedists$dmat), lowest_rank='species')
+taxdata <- taxonomyFromRefpkg(refpkg, seqnames=rownames(treedists$dmat), lowest_rank="species")
 placetab <- data.frame(at=49, edge=5.14909e-07, branch=5.14909e-07)
 result <- classifyPlacements(taxdata, treedists, placetab)
 result
