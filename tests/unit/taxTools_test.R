@@ -83,3 +83,47 @@ test_findOutliers02 <- function(){
   checkTrue(sum(outliers1) > sum(outliers2))
   checkTrue(sum(outliers2) > sum(outliers3))   
 }
+
+
+test_maxDists01 <- function(){
+
+  taxon <- "Enterococcus faecium"
+    
+  someseqs <- seqs[seqdat$tax_name == taxon,]
+  somedat <- subset(seqdat, seqdat$tax_name == taxon)
+  checkTrue(all(rownames(someseqs) == somedat$seqname))
+  
+  dmat <- dist.dna(someseqs, pairwise.deletion=TRUE, as.matrix=TRUE, model='raw')
+  selected <- maxDists(dmat, N=1)
+  checkTrue(length(selected) == 1)
+}
+
+test_maxDists02 <- function(){
+
+  taxon <- "Enterococcus faecium"
+    
+  someseqs <- seqs[seqdat$tax_name == taxon,]
+  somedat <- subset(seqdat, seqdat$tax_name == taxon)
+  checkTrue(all(rownames(someseqs) == somedat$seqname))
+  
+  dmat <- dist.dna(someseqs, pairwise.deletion=TRUE, as.matrix=TRUE, model='raw')
+  selected <- maxDists(dmat, N=10)
+  checkTrue(length(selected) == 10)
+}
+
+test_maxDists03 <- function(){
+
+  taxon <- "Enterococcus faecium"
+    
+  someseqs <- seqs[seqdat$tax_name == taxon,]
+  somedat <- subset(seqdat, seqdat$tax_name == taxon)
+  checkTrue(all(rownames(someseqs) == somedat$seqname))
+  
+  dmat <- dist.dna(someseqs, pairwise.deletion=TRUE, as.matrix=TRUE, model='raw')
+  outliers <- findOutliers(dmat, cutoff=0.015)
+  selected <- maxDists(dmat, N=10, exclude=outliers)
+
+  checkTrue(length(selected) == 10)
+  checkTrue(all(!selected %in% seq(nrow(dmat))[outliers]))
+}
+

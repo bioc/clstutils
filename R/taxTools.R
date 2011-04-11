@@ -4,8 +4,8 @@ maxDists <- function(mat, idx=NA, N=1, exclude=rep(FALSE,nrow(mat)), include.cen
   ## distances.
   ##
   ## * mat - square distance matrix
-  ## * idx - starting indices; if missing, starts with the object with the
-  ##   maximum median distance to all other objects.
+  ## * idx - starting indices; if is.na, starts with the object with the
+  ##   minimum median distance to all other objects.
   ## * N - total number of selections; length of idx is subtracted.
   ## * exclude - boolean vector indicating elements to exclude from the calculation.
   ## * include.center - includes the most central object in the output if TRUE
@@ -19,21 +19,25 @@ maxDists <- function(mat, idx=NA, N=1, exclude=rep(FALSE,nrow(mat)), include.cen
   if(length(idx) == 0 || is.na(idx)){
     idx <- integer(0)
   }
-
+  
   ## add most central element
   if(include.center){
     ## exclude rows corresponding to already selected objects
     m[idx,] <- NA 
     idx <- c(idx, which.min(apply(m,1,median)))
   }
-  
-  ## accumulate a total of N elements
-  for(x in seq(N-length(idx))){    
-    m[idx,] <- NA
-    cols <- m[,idx,drop=FALSE]
-    idx <- c(idx, which.max(apply(cols,1,sum)))
-  }
 
+  remaining <- N - length(idx)
+
+  ## accumulate a total of N elements
+  if(remaining > 0){
+    for(x in seq(remaining)){    
+      m[idx,] <- NA
+      cols <- m[,idx,drop=FALSE]
+      idx <- c(idx, which.max(apply(cols,1,sum)))
+    }
+  }
+  
   ## pairs <- combn(idx, 2)
   ## print(apply(pairs, 2, function(p) mat[p[1],p[2]]))
 
