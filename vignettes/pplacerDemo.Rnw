@@ -98,8 +98,8 @@ expand <- function(fname){
   orig.dir <- getwd()
   destdir <- tempdir()
   setwd(destdir)
-  archive <- system.file('extdata','vaginal_16s.refpkg.tar.bz2', package='clstutils')
-  system(sprintf('tar --no-same-owner -xjf "%s"', archive))
+  archive <- system.file('extdata','vaginal_16s.refpkg.tar.gz', package='clstutils')
+  system(sprintf('tar --no-same-owner -xzf "%s"', archive))
   setwd(orig.dir)
   file.path(destdir, fname)
 }

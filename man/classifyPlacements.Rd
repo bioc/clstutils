@@ -61,13 +61,13 @@ Noah Hoffman
 \examples{
 placefile <- system.file('extdata', 'merged.json', package='clstutils')
 distfile <- system.file('extdata', 'merged.distmat.bz2', package='clstutils')
-refpkgz <- system.file('extdata', 'vaginal_16s.refpkg.tar.bz2', package='clstutils')
+refpkgz <- system.file('extdata', 'vaginal_16s.refpkg.tar.gz', package='clstutils')
 
 tmpdir <- tempdir()
 
 orig.dir <- getwd()
 setwd(tmpdir)
-system(paste("tar --no-same-owner -xjf", refpkgz))
+system(paste("tar --no-same-owner -xzf", refpkgz))
 setwd(orig.dir)
 
 

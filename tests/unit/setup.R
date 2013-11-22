@@ -31,7 +31,7 @@ expand <- function(fname, destdir, package='clstutils'){
   file.path(destdir, unarch)
 }
 
-vag_refpkg <- expand('vaginal_16s.refpkg.tar.bz2', unit_output)
+vag_refpkg <- expand('vaginal_16s.refpkg.tar.gz', unit_output)
 distfile <- expand('merged.distmat.bz2', unit_output)
 
 jsonfile <- system.file('extdata', 'merged.json', package='clstutils')

@@ -69,12 +69,12 @@ Noah Hoffman
   \code{\link{refpkgContents}}
 }
 \examples{
-archive <- 'vaginal_16s.refpkg.tar.bz2'
+archive <- 'vaginal_16s.refpkg.tar.gz'
 destdir <- tempdir()
-system(gettextf('tar -xjf \%s --directory="\%s"',
+system(gettextf('tar -xzf \%s --directory="\%s"',
                 system.file('extdata',archive,package='clstutils'),
                 destdir))
-refpkg <- file.path(destdir, sub('.tar.bz2','',archive))
+refpkg <- file.path(destdir, sub('.tar.gz','',archive))
 reftax <- taxonomyFromRefpkg(refpkg)
 str(reftax)
 }
