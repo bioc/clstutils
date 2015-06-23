@@ -11,19 +11,6 @@ data(seqdat)
 
 # [1] "Enterococcus avium"    "Enterococcus faecalis" "Enterococcus faecium"
 
-test_abspath <- function(){
-
-  files <- c(
-             '.',
-             '..',
-             'runfile.sh',
-             'unit'
-           )
-
-  paths <- clstutils:::.abspath(files)
-  checkTrue(all(file.exists(paths)))  
-}
-
 test_refpkgContents <- function(){
 
   contents <- refpkgContents(vag_refpkg)
