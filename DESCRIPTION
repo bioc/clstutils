@@ -4,7 +4,7 @@ Title: Tools for performing taxonomic assignment.
 Version: 1.41.0
 Depends: R (>= 2.10), clst, rjson, ape
 Imports: lattice, RSQLite
-Suggests: RUnit, RSVGTipsDevice
+Suggests: RUnit
 LazyLoad: yes
 LazyData: yes
 Author: Noah Hoffman
