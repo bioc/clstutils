@@ -2,6 +2,10 @@ import(lattice)
 import(RSQLite)
 import(clst)
 
+importFrom("graphics", "legend", "par", "points", "text")
+importFrom("stats", "median", "quantile")
+importFrom("utils", "read.csv", "read.table")
+
 ## classes
 exportClasses(
 
@@ -16,25 +20,25 @@ export(
        ## placeTools.R
        classifyPlacements,
        ## placeTree,
-       ## unplace,       
+       ## unplace,
        ## placeMat,
        ## placeMap,
        treeDists,
        ## placeData,
-       
+
        ## taxTools.R
        ## nodeTable,
        maxDists,
        findOutliers,
        refpkgContents,
        taxonomyFromRefpkg,
-       
+
        ## treeTools.R
 
        ## prettyTree.R
        prettyTree
 
        ## svgTree.R
-       ## svgTree       
+       ## svgTree
        )
 

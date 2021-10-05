@@ -1,6 +1,6 @@
 Package: clstutils
 Type: Package
-Title: Tools for performing taxonomic assignment.
+Title: Tools for performing taxonomic assignment
 Version: 1.41.0
 Depends: R (>= 2.10), clst, rjson, ape
 Imports: lattice, RSQLite
